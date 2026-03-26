@@ -10,7 +10,8 @@ def index():
     link += "<a href=/today>現在日期時間</a><hr>"
     link += "<a href=/me>關於我</a><hr>"
     link += "<a href=/welcome?u=語婕&d=靜宜資管&c=資訊管理導論>Get傳值</a><hr>"
-    link += "<a href=/accout>POST傳值</a><hr>"
+    link += "<a href=/account>POST傳值</a><hr>"
+    link += "<a href=/次方根號>次方根號計算</a><hr>"
     return link
 
 @app.route("/mis")
@@ -42,5 +43,11 @@ def account():
         return result
     else:
         return render_template("account.html")
+
+@app.route("/次方根號")
+def 次方根號():
+    return render_template("次方根號.ipynb")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
