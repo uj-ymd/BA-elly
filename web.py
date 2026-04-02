@@ -44,9 +44,9 @@ def account():
     else:
         return render_template("account.html")
 
-@app.route("/次方根號")
-def 次方根號():
-    return render_template("次方根號.ipynb")
+@app.route("/math2")
+def math2():
+    return render_template("math2.html")
 
 
 if __name__ == "__main__":
