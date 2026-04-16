@@ -1,3 +1,6 @@
+import requests
+from bs4 import BeautifulSoup
+
 from flask import Flask, render_template,request
 from datetime import datetime
 
@@ -30,7 +33,25 @@ def index():
     link += "<a href=/account>POST傳值</a><hr>"
     link += "<a href=/math2>次方根號計算</a><hr>"
     link += "<a href=/read>讀取Firestore資料</a><hr>"
+    link += "<a href=/read2>靜宜資管老師查詢</a><hr>"
     return link
+
+@app.route("/read2")
+def read2():
+    Result = ""
+    keyword = "康"
+    db = firestore.client()
+    collection_ref = db.collection("靜宜資管2026")
+    docs = collection_ref.get()
+    for doc in docs:
+        teacher = doc.to_dict()
+        if keyword in teacher["name"]:        
+            Result += str(teacher) + "<br>"    
+
+    if Result == "":
+        Result = "抱歉，查無此資料"
+    return Result
+    return render_template("read2.html")
 
 @app.route("/read")
 def read():
