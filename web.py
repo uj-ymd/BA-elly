@@ -34,23 +34,51 @@ def index():
     link += "<a href=/math2>次方根號計算</a><hr>"
     link += "<a href=/read>讀取Firestore資料</a><hr>"
     link += "<a href=/read2>靜宜資管老師查詢</a><hr>"
+    link += "<a href=/spider1>爬曲子青老師本學期課程</a><hr>"
     return link
 
-@app.route("/read2")
-def read2():
-    Result = ""
-    keyword = "康"
-    db = firestore.client()
-    collection_ref = db.collection("靜宜資管2026")
-    docs = collection_ref.get()
-    for doc in docs:
-        teacher = doc.to_dict()
-        if keyword in teacher["name"]:        
-            Result += str(teacher) + "<br>"    
+@app.route("/spider1")
+def spider1():
+    R = ""
+    url = "https://www1.pu.edu.tw/~tcyang/course.html"
+    Data = requests.get(url)
+    Data.encoding = "utf-8"
+    #print(Data.text)
+    sp = BeautifulSoup(Data.text, "html.parser")
+    result=sp.select(".team-box a")
 
-    if Result == "":
-        Result = "抱歉，查無此資料"
-    return Result
+    for i in result:
+        R += i.text + i.get("href") + "<br>"
+    return R
+
+@app.route("/read2", methods=["GET", "POST"])
+def read2():
+    
+    if request.method == "POST":
+        # 接收從網頁表單傳來的老師姓名
+        keyword = request.form.get("teacher_name")
+        
+        Result = f"<h3>關於「{keyword}」的查詢結果：</h3>"
+        found = False
+        
+        # 讀取 Firebase 資料庫
+        collection_ref = db.collection("靜宜資管2026")
+        docs = collection_ref.get()
+        
+        for doc in docs:
+            teacher = doc.to_dict()
+            # 模糊比對老師姓名 (只要包含輸入字元即可)
+            if keyword in teacher.get("name", ""):
+                found = True
+                Result += f"<b>老師姓名：</b>{teacher.get('name')}<br>"
+                Result += f"<b>研究室：</b>{teacher.get('lab', '無資料')}<br>"
+                Result += f"<b>Email：</b>{teacher.get('mail', '無資料')}<br>"
+                Result += "<hr>"
+
+        if not found:
+            Result = f"抱歉，資料庫中找不到名為「{keyword}」的老師資料。"
+        
+        return Result + "<br><a href='/read2'>返回重新查詢</a>"
     return render_template("read2.html")
 
 @app.route("/read")
