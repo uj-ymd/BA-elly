@@ -1,0 +1,22 @@
+<form method="post">
+    請輸入片名關鍵字：
+    <input type="text" name="keyword" value="{{ keyword if keyword else '' }}">
+    <button type="submit">查詢</button>
+</form>
+
+<div class="divider"></div>
+
+{% if movies %}
+    <p class="result-title">查詢結果（關鍵字：{{ keyword }}）：</p>
+    {% for movie in movies %}
+        <div>
+            <a href="{{ movie.link }}" class="teacher-info" target="_blank">
+                {{ movie.title }}
+            </a><br>
+            <img src="{{ movie.img }}" style="width:200px;"><br><br>
+        </div>
+    {% endfor %}
+
+{% elif keyword %}
+    <p>找不到相關關鍵字</p>
+{% endif %}
