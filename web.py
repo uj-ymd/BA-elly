@@ -37,7 +37,46 @@ def index():
     link += "<a href=/spider1>爬取子青老師本學期課程</a><hr>"
     link += "<a href=/movie1>爬取即將上映電影</a><hr>"
     link += "<a href=/spidermovie>爬取即將上映電影</a><hr>"
+    link += "<a href=/searchmovie>即將上映電影查詢</a><hr>"
     return link
+
+@app.route("/searchmovie", methods=['GET', 'POST'])
+def searchmovie():
+    keyword = ""
+    movies = [] 
+
+    if request.method == 'POST':
+        keyword = request.form.get("keyword")
+
+        url = "http://www.atmovies.com.tw/movie/next/"
+        Data = requests.get(url)
+        Data.encoding = "utf-8"
+        sp = BeautifulSoup(Data.text, "html.parser")
+        result = sp.select(".filmListAllX li")
+
+        for item in result:
+            try:
+                # 取得編號與資料
+                movie_id = item.find("a").get("href").replace("/movie/", "").replace("/", "")
+                title = item.find(class_="filmtitle").text
+                picture = "https://www.atmovies.com.tw" + item.find("img").get("src")
+                hyperlink = "https://www.atmovies.com.tw" + item.find("a").get("href")
+                
+                runtime_text = item.find(class_="runtime").text
+                showDate = runtime_text[5:15] if "上映日期" in runtime_text else "未提供"
+
+                if keyword in title:
+                    movies.append({
+                        "movie_id": movie_id,
+                        "title": title,
+                        "picture": picture,
+                        "hyperlink": hyperlink,
+                        "showDate": showDate
+                    })
+            except:
+                continue
+
+    return render_template("serchmovie.html", movies=movies, keyword=keyword)
 
 @app.route("/spidermovie")
 def spidermovie():
