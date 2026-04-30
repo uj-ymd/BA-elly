@@ -1,0 +1,33 @@
+<form method="post">
+    即將上映電影查詢：
+    <input type="text" name="keyword" value="{{ keyword if keyword else '' }}">
+    <button type="submit">查詢</button>
+</form>
+
+<div class="divider" style="margin: 20px 0; border-top: 1px solid #ccc;"></div>
+
+{% if movies %}
+    <p class="result-title">查詢結果 (關鍵字：{{ keyword }}) ：</p>
+    
+    <ul style="list-style-type: none; padding: 0;">
+        {% for movie in movies %}
+        <li style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; display: flex; align-items: flex-start;">
+            <!-- 海報圖片 -->
+            <div style="margin-right: 20px;">
+                <img src="{{ movie.picture }}" style="width: 120px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+            </div>
+
+            <!-- 電影詳細資訊條列 -->
+            <div style="line-height: 1.8;">
+                <strong style="font-size: 1.2em; color: #333;">{{ movie.title }}</strong><br>
+                <b>● 編號：</b> {{ movie.movie_id }} <br>
+                <b>● 上映日期：</b> {{ movie.showDate }} <br>
+                <b>● 更多資訊：</b> <a href="{{ movie.hyperlink }}" target="_blank">進入介紹頁面</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+{% elif keyword %}
+    <p>找不到相關關鍵字「{{ keyword }}」的電影</p>
+{% endif %}
