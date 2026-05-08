@@ -1,0 +1,18 @@
+<form method="post">
+    請輸入城市：
+    <input type="text" name="keyword" value="{{ keyword if keyword else '' }}">
+    <button type="submit">查詢</button>
+</form>
+
+<div class="divider"></div>
+
+{% if weather %}
+    <p class="result-title">查詢結果 (關鍵字：{{ keyword }})：</p>
+    {% for info in weather %}
+        <div class="weather-box">
+            <p>{{ info }}</p>
+        </div>
+    {% endfor %}
+{% elif keyword %}
+    <p>找不到相關關鍵字</p>
+{% endif %}
