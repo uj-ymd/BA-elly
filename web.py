@@ -39,7 +39,45 @@ def index():
     link += "<a href=/spidermovie>爬取即將上映電影</a><hr>"
     link += "<a href=/searchmovie>即將上映電影查詢</a><hr>"
     link += "<a href=/road>台中市十大肇事路口</a><hr>"
+    link += "<a href=/weather>各縣市天氣查詢</a><hr>"
     return link
+
+
+@app.route("/weather", methods=['GET', 'POST'])
+def weather():
+    keyword = ""
+    weather_results = []
+
+    if request.method == 'POST':
+        keyword = request.form.get("keyword").strip()
+        
+        search_city = keyword.replace("台", "臺")
+        if not search_city.endswith(("市", "縣")):
+            search_city += "市"
+
+        token = "rdec-key-123-45678-011121314" 
+        url = f"https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization={token}&format=JSON&locationName={search_city}"
+
+        try:
+            response = requests.get(url)
+            data = response.json()
+
+            if data.get("records") and data["records"].get("location"):
+                loc_data = data["records"]["location"][0]
+                city_name = loc_data["locationName"]
+                
+                elements = loc_data["weatherElement"]
+                desc = elements[0]["time"][0]["parameter"]["parameterName"]
+                rain = elements[1]["time"][0]["parameter"]["parameterName"]
+                
+                result_str = f"{city_name} 目前天氣：{desc}，降雨機率：{rain}%"
+                weather_results.append(result_str)
+            else:
+                print(f"找不到該地點的資料：{search_city}")
+                
+        except Exception as e:
+            print(f"發生錯誤：{e}")
+    return render_template("weather.html", weather=weather_results, keyword=keyword)
 
 @app.route("/road")
 def road():
